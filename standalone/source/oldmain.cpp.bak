@@ -1,0 +1,48 @@
+#include <cxxopts.hpp>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+
+auto main(int argc, char** argv) -> int {
+  const std::unordered_map<std::string, devquery::DeviceCode> devcodes{
+      {"CISCO_IOSXE", devquery::DeviceCode::CISCO_IOSXE}, {"SNMPV3", devquery::DeviceCode::SNMPV3}};
+
+  cxxopts::Options options(*argv, "A program to welcome the world!");
+
+  std::string devCode;
+  std::string devIp;
+  std::string devQuery;
+
+  // clang-format off
+  options.add_options()
+    ("h,help", "Show help")
+    ("v,version", "Print the current version number")
+    ("i,ip", "Device ip to query", cxxopts::value(devIp)->default_value("127.0.0.1"))
+    ("d,device", "Language code to use", cxxopts::value(devCode)->default_value("CISCO_IOSXE"))
+    ("q,query", "Query to send to the device", cxxopts::value(devQuery)->default_value("CiscoIOS-XE::clientOperData;"));
+
+  // clang-format on
+
+  auto result = options.parse(argc, argv);
+
+  if (result["help"].as<bool>()) {
+    std::cout << options.help() << std::endl;
+    return 0;
+  }
+
+  if (result["version"].as<bool>()) {
+    std::cout << "Devquery, version " << DEVQUERY_VERSION << std::endl;
+    return 0;
+  }
+
+  auto devIt = devcodes.find(devCode);
+  if (devIt == devcodes.end()) {
+    std::cerr << "unknown device code: " << devCode << std::endl;
+    return 1;
+  }
+
+  devquery::DevQuery devquery(devIp);
+  std::cout << devquery.get(devQuery) << std::endl;
+
+  return 0;
+}

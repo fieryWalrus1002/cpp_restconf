@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 # Note: update this to your new project's name and version
 project(
-  Greeter
+  Devquery
   VERSION 1.0
   LANGUAGES CXX
 )
@@ -49,6 +49,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 # being a cross-platform target, we enforce standards conformance on MSVC
 target_compile_options(${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->")
+
+
+# ---- Include BOOST ----
+SET (BOOST_ROOT "/usr/local/boost_1_80_0")
+find_package(Boost)
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::boost curl)
 
 # Link dependencies
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
